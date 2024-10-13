@@ -1,10 +1,10 @@
 import { embed, embedMany } from 'ai'
-import { cosineDistance, desc, sql } from 'drizzle-orm'
+import { cosineDistance, desc, gt, sql } from 'drizzle-orm'
 
-import { registry } from '../../setup-registry'
 import { db as database } from '../db'
 import { embeddings } from '../db/schema/embeddings'
 import { environment } from '../environment.mjs'
+import { registry } from './setup-registry'
 
 const embeddingModel = registry.textEmbeddingModel(environment.MODEL_EMBEDDING)
 
@@ -50,7 +50,7 @@ export const findRelevantContent = async (
   const similarGuides = await database
     .select({ name: embeddings.content, similarity })
     .from(embeddings)
-    // .where(gt(similarity, 0.1))
+    .where(gt(similarity, 0.3))
     .orderBy((t) => desc(t.similarity))
     .limit(4)
 

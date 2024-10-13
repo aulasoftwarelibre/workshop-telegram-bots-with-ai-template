@@ -1,24 +1,17 @@
 import process from 'node:process'
 
-import dotenv from 'dotenv'
 import { Bot } from 'grammy'
 
-dotenv.config()
+import { start } from './lib/commands/start'
+import { environment } from './lib/environment.mjs'
+import { onMessage } from './lib/handlers/on-message'
 
 async function main(): Promise<void> {
-  const bot = new Bot(process.env.BOT_TOKEN ?? '')
+  const bot = new Bot(environment.BOT_TOKEN)
 
-  bot.command('start', async (context) => {
-    const content = 'Welcome, how can I help you?'
+  bot.command('start', start)
 
-    await context.reply(content)
-  })
-
-  bot.on('message:text', async (context) => {
-    const userMessage = context.message.text
-
-    await context.reply(userMessage)
-  })
+  bot.use(onMessage)
 
   // Enable graceful stop
   process.once('SIGINT', () => bot.stop())
